@@ -7,16 +7,19 @@ let oldSum = 0;
 let poolCount = 0;
 let poolSum = 0;
 
+// create a connection pool to the specified postgres db instance
+// nothing more than a cache of a pool of database connections
 const pool = new Pool({
-    "host": "husseinmac.local",
+    "host": "husseinmac.local", // replace with the local host
     "port": 5432,
     "user":"postgres",
     "password" : "postgres",
-    "database" : "husseindb",
-    "max": 10
+    "database" : "husseindb", // replace with the actual name
+    "max": 10 // maximum number of connections allowed
 })
 
 
+// without using connection pooling
 app.get("/old", async (req, res) => {
     const fromDate = new Date();
     oldCount++;
@@ -37,6 +40,7 @@ app.get("/old", async (req, res) => {
     //end
     client.end();
 
+    // record the time elapsed
     const toDate = new Date();
     const elapsed = toDate.getTime() - fromDate.getTime();
     oldSum += elapsed;
@@ -46,7 +50,7 @@ app.get("/old", async (req, res) => {
 })
 
 
-
+// using connection pooling
 app.get("/pool", async (req, res) => {
     const fromDate = new Date();
     poolCount ++;
@@ -65,6 +69,7 @@ app.get("/pool", async (req, res) => {
 app.listen(9000, () => console.log("Listening on port 9000"))
 
 /*
+js console scripts for performance bench-marking
 
 for (let i = 0; i < 1000; i++) fetch(`http://localhost:9000/old`).then(a=>a.json()).then(console.log).catch(console.error);
 for (let i = 0; i < 1000; i++) fetch(`http://localhost:9000/pool`).then(a=>a.json()).then(console.log).catch(console.error);
